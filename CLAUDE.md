@@ -34,8 +34,12 @@ stockée en base, réutilisée pour la recherche, les notifications et par d'aut
 | Environnement QA (première fois, par version) | `make qa-setup GLPI=…` |
 | **Tout vérifier sur les 2 versions (= CI)** | `make check-all` |
 | Vérifier une version | `make check GLPI=11` |
+| Test de bout en bout sur l'image de production (OCR réel) | `make e2e GLPI=…` |
 | Tests ciblés | `make test FILTER=Ocr` |
 | Corriger le style | `make rector-fix GLPI=12 && make rector-fix GLPI=11` |
+
+CI GitHub : `.github/workflows/ci.yml` (QA v11/v12 avec images officielles + Tesseract, puis `make e2e` v11/v12).
+Toute nouvelle étape de vérification locale doit y être ajoutée aussi.
 
 Docker au lieu de Podman : `COMPOSE_BIN="docker compose"`. Après une modification du schéma SQL ou de `setup.php` :
 `make plugin-reinstall` (exécution) et `make qa-setup` (QA).
