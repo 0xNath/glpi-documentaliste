@@ -1,5 +1,7 @@
 # Documentaliste
 
+[![CI](https://github.com/0xNath/glpi-documentaliste/actions/workflows/ci.yml/badge.svg)](https://github.com/0xNath/glpi-documentaliste/actions/workflows/ci.yml)
+
 Plugin GLPI 11 et 12 qui décrit automatiquement les pièces jointes (images, Word, Excel, PowerPoint, OpenDocument,
 texte, avec OCR local des images) et stocke une **description synthétique, des mots-clés et les catégories de contenu sensible détectées**
 pour la recherche, les notifications et d'autres plugins.

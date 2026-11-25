@@ -28,7 +28,7 @@ QA_EXEC   := $(COMPOSE) --profile qa exec -T qa
 QA_GLPI   := $(COMPOSE) --profile qa exec -T -u www-data -w /var/www/glpi qa
 
 .PHONY: help up down reset logs console plugin-install plugin-reinstall cron \
-        qa-up qa-down qa-setup test phpstan cs cs-fix rector rector-fix headers lint check check-all build
+        qa-up qa-down qa-setup test phpstan cs cs-fix rector rector-fix headers lint check check-all build wait e2e
 
 help: ## Show this help
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
@@ -63,6 +63,20 @@ plugin-reinstall: ## Uninstall then install the plugin (drops plugin data)
 
 cron: ## Force-run the plugin automatic action in the runtime GLPI
 	$(GLPI_EXEC) php front/cron.php --force analyze
+
+wait: ## Wait until the runtime GLPI answers (first boot installs the database)
+	@for i in $$(seq 1 120); do \
+	  code=$$(curl -s -o /dev/null -w '%{http_code}' http://localhost:$(GLPI_PORT)/ || true); \
+	  if [ "$$code" = 200 ] || [ "$$code" = 302 ]; then echo "GLPI $(GLPI) ready on port $(GLPI_PORT)"; exit 0; fi; \
+	  sleep 5; \
+	done; echo "GLPI $(GLPI) did not start"; $(COMPOSE) logs glpi | tail -n 50; exit 1
+
+e2e: up wait ## End-to-end OCR test on the RUNTIME (production) image
+	$(GLPI_EXEC) bin/console plugin:install --no-interaction --force --username=glpi $(PLUGIN)
+	$(GLPI_EXEC) bin/console plugin:activate --no-interaction $(PLUGIN)
+	$(GLPI_EXEC) php plugins/$(PLUGIN)/tests/e2e/ocr_smoke.php add
+	$(GLPI_EXEC) php front/cron.php --force analyze
+	$(GLPI_EXEC) php plugins/$(PLUGIN)/tests/e2e/ocr_smoke.php verify
 
 # --- QA (official plugin CI image) -------------------------------------------
 
