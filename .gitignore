@@ -1,0 +1,8 @@
+# Read-only GLPI reference clone (re-create with: git clone --depth 1 --branch 12.0.2 https://github.com/glpi-project/glpi.git glpi-src)
+/glpi-src/
+/glpi-src-11/
+
+# Local Claude Code settings
+/.claude/settings.local.json
+
+.env

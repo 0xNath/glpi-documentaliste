@@ -1,0 +1,17 @@
+# Adds the local OCR engine (Tesseract 5, CPU only) to an official GLPI image.
+# Used for both runtime (glpi/glpi:<version>) and QA (githubactions-glpi-apache) images.
+#
+# On a production server, the equivalent is simply:
+#   apt install tesseract-ocr tesseract-ocr-fra tesseract-ocr-eng
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+USER root
+RUN apt-get update \
+    && apt-get install --assume-yes --no-install-recommends \
+        tesseract-ocr tesseract-ocr-fra tesseract-ocr-eng \
+    && rm -rf /var/lib/apt/lists/* \
+    && tesseract --version | head -1
+
+ARG RUN_AS=www-data
+USER ${RUN_AS}

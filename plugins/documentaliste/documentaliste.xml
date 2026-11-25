@@ -1,0 +1,55 @@
+<root>
+   <name>Documentaliste</name>
+   <key>documentaliste</key>
+   <!-- stable, beta, development, alpha, ... -->
+   <state>development</state>
+   <description>
+      <short>
+         <!-- Add as many lang tag you want -->
+         <en>Synthetic descriptions of attachments (images, office documents...) for search, notifications and sensitive data detection.</en>
+         <fr>Descriptions synthétiques des pièces jointes (images, documents bureautiques...) pour la recherche, les notifications et la détection de données sensibles.</fr>
+      </short>
+      <long>
+         <!-- Add as many lang tag you want -->
+         <en>Analyzes every document added to GLPI, stores a synthetic description, keywords and detected sensitive content categories, and exposes them to the search engine, notifications and other plugins.</en>
+         <fr>Analyse chaque document ajouté dans GLPI, stocke une description synthétique, des mots-clés et les catégories de contenu sensible détectées, et les expose au moteur de recherche, aux notifications et aux autres plugins.</fr>
+      </long>
+   </description>
+   <homepage>TODO</homepage>
+   <download>TODO</download>
+   <issues>TODO</issues>
+   <readme>TODO</readme>
+   <authors>
+      <!-- Add as many author tag you want -->
+      <author>Documentaliste plugin team</author>
+   </authors>
+   <versions>
+      <!-- Add as many version tag you want -->
+      <version>
+         <num>0.2.0</num>
+         <!-- Add as many compatibility tag you want -->
+         <compatibility>~11.0.0</compatibility>
+         <compatibility>~12.0.0</compatibility>
+      </version>
+   </versions>
+   <langs>
+      <!-- Add as many lang tag you want -->
+      <lang>en_GB</lang>
+      <lang>fr_FR</lang>
+   </langs>
+   <license>MIT</license>
+   <!--tags>
+      <en>
+         <tag>One tag</tag>
+         <tag>Another tag</tag>
+      </en>
+      <fr>
+         <tag>Un tag</tag>
+         <tag>Un autre tag</tag>
+      </fr>
+   </tags-->
+   <!--screenshots>
+      <screenshot>https://github.com/pluginsGLPI/documentaliste/raw/main/screenshot.png</screenshot>
+      <screenshot>https://github.com/pluginsGLPI/documentaliste/raw/main/screenshot2.png</screenshot>
+   </screenshots-->
+</root>

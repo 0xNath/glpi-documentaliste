@@ -1,0 +1,80 @@
+{#
+ # -------------------------------------------------------------------------
+ # Documentaliste plugin for GLPI
+ # -------------------------------------------------------------------------
+ #
+ # MIT License
+ #
+ # Permission is hereby granted, free of charge, to any person obtaining a copy
+ # of this software and associated documentation files (the "Software"), to deal
+ # in the Software without restriction, including without limitation the rights
+ # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ # copies of the Software, and to permit persons to whom the Software is
+ # furnished to do so, subject to the following conditions:
+ #
+ # The above copyright notice and this permission notice shall be included in all
+ # copies or substantial portions of the Software.
+ #
+ # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ # SOFTWARE.
+ # -------------------------------------------------------------------------
+ # @copyright Copyright (C) 2026 by the Documentaliste plugin team.
+ # @license   MIT https://opensource.org/licenses/mit-license.php
+ # -------------------------------------------------------------------------
+ #}
+
+<div class="card">
+   <div class="card-body">
+      {% if description is null %}
+         <p class="text-muted mb-0">{{ __('This document has not been queued for analysis.', 'documentaliste') }}</p>
+      {% else %}
+         {% set status = description.fields['status'] %}
+         <dl class="row mb-0">
+            <dt class="col-sm-3">{{ __('Analysis status', 'documentaliste') }}</dt>
+            <dd class="col-sm-9">
+               <span class="badge {{ status == 'done' ? 'bg-green-lt' : (status == 'error' ? 'bg-red-lt' : 'bg-secondary-lt') }}">{{ status }}</span>
+            </dd>
+
+            {% if description.fields['summary'] is not empty %}
+               <dt class="col-sm-3">{{ __('Synthetic description', 'documentaliste') }}</dt>
+               <dd class="col-sm-9">{{ description.fields['summary'] }}</dd>
+            {% endif %}
+
+            {% if keywords is not empty %}
+               <dt class="col-sm-3">{{ __('Keywords', 'documentaliste') }}</dt>
+               <dd class="col-sm-9">
+                  {% for keyword in keywords %}
+                     <span class="badge bg-blue-lt me-1">{{ keyword }}</span>
+                  {% endfor %}
+               </dd>
+            {% endif %}
+
+            {% if detected_types is not empty %}
+               <dt class="col-sm-3">{{ __('Detected sensitive content', 'documentaliste') }}</dt>
+               <dd class="col-sm-9">
+                  {% for type in detected_types %}
+                     <span class="badge bg-orange-lt me-1"><i class="ti ti-alert-triangle"></i> {{ type }}</span>
+                  {% endfor %}
+               </dd>
+            {% endif %}
+
+            {% if description.fields['error_message'] is not empty %}
+               <dt class="col-sm-3">{{ __('Last error', 'documentaliste') }}</dt>
+               <dd class="col-sm-9 text-danger">{{ description.fields['error_message'] }}</dd>
+            {% endif %}
+
+            {% if description.fields['date_analyzed'] is not empty %}
+               <dt class="col-sm-3">{{ __('Analyzed on', 'documentaliste') }}</dt>
+               <dd class="col-sm-9">{{ description.fields['date_analyzed']|formatted_datetime }}
+                  <span class="text-muted">({{ description.fields['describer'] }}{{ description.fields['model'] ? ' / ' ~ description.fields['model'] : '' }})</span>
+               </dd>
+            {% endif %}
+         </dl>
+      {% endif %}
+   </div>
+</div>

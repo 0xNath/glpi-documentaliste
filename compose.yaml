@@ -1,0 +1,87 @@
+# Development environment for the Documentaliste GLPI plugin.
+# Works with `podman-compose`, `podman compose` and `docker compose`.
+# Use the Makefile: it selects the GLPI major version (GLPI=12 default, GLPI=11) and a
+# separate compose project per version, so both stacks can run side by side.
+#
+#   glpi + db       : GLPI runtime (official image + Tesseract OCR), UI on http://localhost:${GLPI_PORT}
+#   qa + db-test    : official plugin CI image (+ Tesseract), for PHPUnit / PHPStan / cs.
+#                     Started with `--profile qa`.
+#
+# Dev-only credentials: never reuse them anywhere else.
+
+services:
+  db:
+    image: docker.io/library/mariadb:10.11
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: glpi
+      MARIADB_USER: glpi
+      MARIADB_PASSWORD: glpi
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  glpi:
+    image: localhost/documentaliste-glpi:${GLPI_RUNTIME_TAG:-12.0.2}
+    build:
+      context: ./docker
+      dockerfile: Containerfile
+      args:
+        BASE_IMAGE: docker.io/glpi/glpi:${GLPI_RUNTIME_TAG:-12.0.2}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      GLPI_DB_HOST: db
+      GLPI_DB_PORT: "3306"
+      GLPI_DB_NAME: glpi
+      GLPI_DB_USER: glpi
+      GLPI_DB_PASSWORD: glpi
+    volumes:
+      - glpi_data:/var/glpi
+      - ./plugins/documentaliste:/var/www/glpi/plugins/documentaliste:z
+    ports:
+      - "${GLPI_PORT:-8090}:80"
+
+  db-test:
+    image: docker.io/library/mariadb:10.11
+    profiles: ["qa"]
+    environment:
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
+      MARIADB_DATABASE: glpi
+    tmpfs:
+      - /var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  qa:
+    image: localhost/documentaliste-qa:php-${QA_PHP:-8.3}-glpi-${GLPI_BRANCH:-12.0.x}
+    build:
+      context: ./docker
+      dockerfile: Containerfile
+      args:
+        BASE_IMAGE: ghcr.io/glpi-project/githubactions-glpi-apache:php-${QA_PHP:-8.3}-glpi-${GLPI_BRANCH:-12.0.x}
+    profiles: ["qa"]
+    # Root inside a rootless container = your host user: lets composer write
+    # vendor/ in the mounted plugin directory.
+    user: "0:0"
+    depends_on:
+      db-test:
+        condition: service_healthy
+    working_dir: /var/www/glpi/plugins/documentaliste
+    entrypoint: ["sleep", "infinity"]
+    volumes:
+      - ./plugins/documentaliste:/var/www/glpi/plugins/documentaliste:z
+
+volumes:
+  db_data:
+  glpi_data:
